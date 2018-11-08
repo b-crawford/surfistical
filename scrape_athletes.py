@@ -2,7 +2,7 @@ from requests_html import HTMLSession
 import pandas as pd
 from html.parser import HTMLParser
 import re
-
+import numpy as np
 
 mens_url = 'http://www.worldsurfleague.com/athletes?tourIds[]=1'
 womens_url = 'http://www.worldsurfleague.com/athletes?tourIds%5B%5D=2'
@@ -26,22 +26,57 @@ names = [i.split('/')[-1] for i in links]
 links = [y for x,y in sorted(zip(names,links))]
 names = [x for x,y in sorted(zip(names,links))]
 
-link = links[0]
+df = pd.DataFrame(index = range(len(links)),columns=['name','stance','first_season','current_age','birthday','height_imperial',
+        'height_metric','weight_imperial','weight_metric','hometown','heat_wins','avg_heat_score','rookie_year'])
 
+# testing
+link = links[2]
 r = session.get(link)
 html = r.html.text
 
-stance = re.search('Stance\n(.*)\n', html).group(1)
-first_season = re.search('First season\n(.*)\n', html).group(1)
-current_age = re.search('Age\n(.*)\n', html).group(1).split(" ")[0]
-birthday = re.search('Age\n(.*)\n', html).group(1).split(" ")[-3:]
-height_imperial = re.search('Height\n(.*)\n', html).group(1).split(" ")[:4]
-height_metric = re.search('Height\n(.*)\n', html).group(1).split(" ")[-2:]
-weight_imperial = re.search('Weight\n(.*)\n', html).group(1).split(" ")[:2]
-weight_metric = re.search('Weight\n(.*)\n', html).group(1).split(" ")[-2:]
-hometown = re.search('Hometown\n(.*)\n', html).group(1)
-heat_wins = re.search('Heat wins\n(.*)\n', html).group(1)
-avg_heat_score = re.search('Avg. heat score\n(.*)\n', html).group(1)
-rookie_year = re.search('Rookie year\n(.*)\n', html).group(1)
+def pull_data(start_term, end_term, string_split_start = 0, string_split_end = None):
+    pull1 = re.search(start_term + '(.*)' + end_term, html)
+    try:
+        pull2 = pull1.group(1)
+        split = pull2.split(' ')
+        if string_split_end is None:
+            string_split_end = len(split)
+        pull3 = split[string_split_start:string_split_end]
+        join = " ".join(pull3)
+        return(join)
+    except:
+        return(None)
 
-# we are not currenlty collecting data in the table at the bottom of the page
+
+for i, link in enumerate(links):
+    print(i)
+
+    name = names[i]
+
+    r = session.get(link)
+    html = r.html.text
+
+    stance = pull_data('Stance\n','\n')
+    first_season =  pull_data('First season\n','\n')
+    current_age = pull_data('Age\n(.*)','\n',string_split_end = 1)
+    birthday = pull_data('Age\n(.*)','\n',string_split_start = -3)
+    height_imperial = pull_data('Height\n','\n',string_split_end = 4)
+    height_metric = pull_data('Height\n','\n',string_split_start = -2)
+    weight_imperial = pull_data('Weight\n','\n',string_split_end = 2)
+    weight_metric = pull_data('Weight\n','\n',string_split_start = -2)
+    hometown = pull_data('Hometown\n','\n')
+    heat_wins = pull_data('Heat wins\n','\n')
+    avg_heat_score = pull_data('Avg. heat score\n','\n')
+    rookie_year = pull_data('Rookie year\n','\n')
+
+
+    # we are not currenlty collecting data in the table at the bottom of the page
+
+    row = [name,stance,first_season,current_age,birthday,height_imperial,
+            height_metric,weight_imperial,weight_metric,hometown,heat_wins,
+            avg_heat_score,rookie_year]
+
+    df.iloc[i] = row
+
+
+df.head()
