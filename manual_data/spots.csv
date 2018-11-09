@@ -1,0 +1,28 @@
+spot-name,url,tide,type,bed,swell_direction,wind_direction,max_swell,min_swell
+snapper-rocks,https://magicseaweed.com/Snapper-Rocks-Surf-Report/1014/,All Tides,Right-hand Pointbreak,Sand,NE - S,South Westerly,10ft,3ft
+bells-beach,https://magicseaweed.com/Bells-Beach-Surf-Report/524/,Mid to High Tide,Right-hand Pointbreak,Rock Ledge,SE - SW,North Westerly,18ft,3ft
+barra-da-tijuca,https://magicseaweed.com/Barra-da-Tijuca-Surf-Report/947/,All Tides,Peaky Beachbreak,Sand,NE - S,Northerly,6ft,1ft
+j-bay,https://magicseaweed.com/Jeffreys-Bay-J-Bay-Surf-Report/88/,All Tides,Right-hand Pointbreak,Boulders and Sand,SE - SW,South Westerly,12ft,2ft
+teahupoo,https://magicseaweed.com/Teahupoo-Surf-Report/619/,All Tides,Left-hand break over submerged reef,Live Coral,SE - W,North Easterly,18ft,3ft
+long-beach,https://magicseaweed.com/Long-Beach-Surf-Report/383/,All Tides,"Pier, Groyne or Jetty with Peaks",Sand,E - S,Northerly,8ft,2ft
+trestles,https://magicseaweed.com/Trestles-Surf-Report/291/,All Tides,Submerged reef with peaky waves,Boulders and Sand,S - W,North Easterly,12ft,1ft
+la-graviere,https://magicseaweed.com/Hossegor-La-Graviere-Surf-Report/61/,All Tides,Peaky Beachbreak,Sand,W - N,Easterly,15ft,3ft
+supertubos,https://magicseaweed.com/Supertubos-Surf-Report/196/,All Tides,Peaky Beachbreak,Sand,S - NW,North Easterly,10ft,3ft
+ocean-beach,https://magicseaweed.com/Ocean-Beach-Surf-Report/255/,All Tides,Peaky Beachbreak,Sand,S - N,Easterly,20ft,3ft
+pipeline,https://magicseaweed.com/Pipeline-Backdoor-Surf-Report/616/,All Tides,Submerged reef with peaky waves,Uneven Reef,W - N,South Easterly,20ft,4ft
+kirra,https://magicseaweed.com/Kirra-Surf-Report/528/,All Tides,Right-hand Pointbreak,Sand,NE - S,Westerly,12ft,2ft
+cloudbreak,https://magicseaweed.com/Tavarua-Cloudbreak-Surf-Report/669/,All Tides,Left-hand break over submerged reef,Live Coral,S - W,South Easterly,25ft,3ft
+steamer-lane,https://magicseaweed.com/Steamer-Lane-Surf-Report/163/,All Tides,Submerged reef with peaky waves,Uneven Reef and Sand,S - NW,North Westerly,18ft,2ft
+keramas,https://magicseaweed.com/Keramas-Surf-Report/909/,All Tides,Right-hand break over submerged reef,Dead Coral,S - SW,North Westerly,12ft,2ft
+la-penon,https://magicseaweed.com/Le-Penon-Surf-Report/1529/,All Tides,Peaky Beachbreak,Sand,W - N,Easterly,10ft,1ft
+margaret-river,https://magicseaweed.com/Margaret-River-Surf-Report/518/,All Tides,Submerged reef with peaky waves,Uneven Reef and Sand,S - NW,Easterly,25ft,4ft
+molho-leste,https://magicseaweed.com/Molho-Leste-Surf-Report/4347/,All Tides,"Right off a Pier, Groyne or Jetty",Sand,S - W,Northerly,10ft,4ft
+itauna,https://magicseaweed.com/Itauna-Surf-Report/3193/,All Tides,Left-hand break over submerged reef,Sand,NE - SW,North Westerly,12ft,1ft
+uluwatu,https://magicseaweed.com/Uluwatu-Surf-Report/565/,All Tides,Left-hand break over submerged reef,Dead Coral,S - W,South Easterly,15ft,2ft
+huntington-beach,https://magicseaweed.com/Huntington-Pier-Surf-Report/286/,All Tides,"Pier, Groyne or Jetty with Peaks",Sand,S - NW,North Easterly,10ft,1ft
+honolua-bay,https://magicseaweed.com/Honolua-Surf-Report/697/,All Tides,Right-hand Pointbreak,Uneven Reef,W - NE,North Easterly,20ft,3ft
+carcavelos,https://magicseaweed.com/Carcavelos-Surf-Report/912/,All Tides,Peaky Beachbreak,Sand,S - NW,North Easterly,10ft,3ft
+fitzroy-beach,https://magicseaweed.com/Waiwakaiho-Surf-Report/1956/,High Tide Only,Submerged reef with peaky waves,Uneven Reef,SW - N,South Easterly,ft,ft
+manly,https://magicseaweed.com/North-South-Steyne-Surf-Report/2937/,All Tides,Peaky Beachbreak,Sand,NE - S,Westerly,15ft,1ft
+dee-why,https://magicseaweed.com/Dee-Why-Point-Surf-Report/999/,Mid Tide Only,Right-hand break over submerged reef,Rock Ledge,E - S,South Westerly,20ft,4ft
+surf-ranch,,All Tides,Peaky Beachbreak,Sand,,,6ft,3ft
