@@ -31,10 +31,6 @@ for mens_womens in ['mens', 'womens']:
     df = pd.DataFrame(index = range(len(links)),columns=['name','stance','first_season','current_age','birthday','height_imperial',
             'height_metric','weight_imperial','weight_metric','hometown','heat_wins','avg_heat_score','rookie_year'])
 
-    # testing
-    link = links[2]
-    r = session.get(link)
-    html = r.html.text
 
     for i, link in enumerate(links):
         print(mens_womens + str(i))
@@ -49,7 +45,7 @@ for mens_womens in ['mens', 'womens']:
         current_age = scrape_function.pull_data(html,'Age\n(.*)','\n',string_split_end = 1)
         birthday = scrape_function.pull_data(html, 'Age\n(.*)','\n',string_split_start = -3)
         height_imperial = scrape_function.pull_data(html,'Height\n','\n',string_split_end = 4)
-        height_metric = scrape_function.pull_data(html,' Height\n','\n',string_split_start = -2)
+        height_metric = scrape_function.pull_data(html,'Height\n','\n',string_split_start = -2)
         weight_imperial = scrape_function.pull_data(html,'Weight\n','\n',string_split_end = 2)
         weight_metric = scrape_function.pull_data(html, 'Weight\n','\n',string_split_start = -2)
         hometown = scrape_function.pull_data(html, 'Hometown\n','\n')
