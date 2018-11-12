@@ -3,7 +3,7 @@ import pandas as pd
 import re
 import datetime
 
-year = now = datetime.datetime.now().year
+year = datetime.datetime.now().year
 
 # define the function which pulls the grid off the page:
 def url_to_table(url):
@@ -40,7 +40,7 @@ def url_to_table(url):
     return(dat)
 
 
-for mens_womens in ['mens', 'womans']:
+for mens_womens in ['mens', 'womens']:
     print(mens_womens + ' ' + str(year))
     # define the url to scrape from
     if mens_womens == 'mens':

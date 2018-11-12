@@ -38,7 +38,7 @@ def url_to_table(url):
     return(dat)
 
 
-for mens_womens in ['mens', 'womans']:
+for mens_womens in ['mens', 'womens']:
     for year in range(2000, 2019, 1):
         print(mens_womens + ' ' + str(year))
         # define the url to scrape from
@@ -99,10 +99,12 @@ for mens_womens in ['mens', 'womans']:
             event_names = r.html.find(css_tag_of_event_name)
             event_names = [i.text for i in event_names]
 
-            colnames2 = [i.replace(" ", "-") for i in event_names]
+            colnames2 = [i.replace(" ", "-")+'-'+str(year) for i in event_names]
 
             event_location = r.html.find(css_tag_of_event_location)
             event_location = [i.text for i in event_location]
+
+            event_country = [i.split(',')[-1:][0].strip() for i in event_location]
 
             event_date = r.html.find(css_tag_of_event_dates)
             event_date = [i.text for i in event_date]
@@ -120,7 +122,8 @@ for mens_womens in ['mens', 'womans']:
             # Next we use the rest of the data from the events page to create an
             # events dataframe
             events = pd.DataFrame(
-                {'name': event_names,
+                {'name': colnames2,
+                 'country': event_country,
                  'location': event_location,
                  'date': event_date})
 
