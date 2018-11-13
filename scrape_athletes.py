@@ -64,4 +64,4 @@ for mens_womens in ['mens', 'womens']:
 
     year = str(datetime.datetime.now().year)
     filepath = 'data/athletes_' +mens_womens+'_'+year+'.csv'
-    df.to_csv(filepath, index = False)
+    df.to_csv(filepath, index=False)

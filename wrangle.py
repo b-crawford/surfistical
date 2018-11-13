@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+from scrape_function import pull_data
+from requests_html import HTMLSession
 
 # safe read csv files
 def safe_read(filepath):
@@ -77,15 +79,59 @@ for year in range(first_year,last_year+1):
 
 
 # combine all athlete data into one:
-athletes
+athletes = athletes.fillna('')
 athletes.head()
 
-one_hot_athletes = pd.DataFrame(athletes['name'])
+# Extract columns we are going to use:
+athletes_use = pd.DataFrame(athletes['name'])
+athletes_use['stance'] = athletes['stance']
+athletes_use['birthyear'] = [i.split(', ')[1] for i in athletes['birthday']]
+athletes_use['height'] = [i.split(' ')[0] for i in athletes['height_metric']]
+athletes_use['weight'] = [i.split(' ')[0] for i in athletes['weight_metric']]
+athletes_use['homecountry'] =  [i.split(', ')[-1:][0] for i in athletes['hometown']]
+athletes_use[['rookie_year']] = athletes[['rookie_year']]
+
+# note we are not using avg heat score or heat wins as they refer to the very
+# contests we are training the system on
+
+# merge with all athletes in result set:
+all_athletes = pd.DataFrame(results['name'])
+athletes_use = pd.merge(athletes_use,all_athletes, how ='outer',on = ['name'],suffixes = ['',''])
+
+athletes_use.head()
+# see what data is missing:
+athletes_use = athletes_use.replace('',np.nan, regex=True)
+athletes_use.isna().sum()
+
+athletes_use.loc[athletes_use['birthyear'].isna(),].head()
+
+# try and gather missing data from Wikipedia:
+missing = athletes_use.loc[athletes_use.isna().any(axis = 1),].reset_index()
+complete = athletes_use.loc[~athletes_use.isna().any(axis = 1),]
+
+missing['name']
+
+i = 15
+name = '_'.join([i.capitalize()for i in missing['name'][i].split('-')])
+
+url = 'https://en.wikipedia.org/wiki/'+name
+
+session = HTMLSession()
+r = session.get(url)
+
+url
+
+html = r.html.text
+
+stance = scrape_function.pull_data(html, 'Stance\n', '\n')
 
 
 
 
 
+
+# athletes_use['heat_wins'] = pd.to_numeric(athletes_use['heat_wins'])
+# athletes_use['heat_wins'].quantile([0.25,0.5,0.75])
 
 
 

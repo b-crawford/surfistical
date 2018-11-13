@@ -13,10 +13,10 @@ def pull_data(html,start_term, end_term, string_split_start = 0, string_split_en
         join = " ".join(pull3)
         return(join)
     except:
-        return('Test')
+        return(None)
 
 
-# 
+#
 #
 # # testing
 # import pandas as pd
