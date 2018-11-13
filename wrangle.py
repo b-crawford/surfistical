@@ -111,7 +111,7 @@ complete = athletes_use.loc[~athletes_use.isna().any(axis = 1),]
 
 missing['name']
 
-i = 15
+i = 0
 name = '_'.join([i.capitalize()for i in missing['name'][i].split('-')])
 
 url = 'https://en.wikipedia.org/wiki/'+name
@@ -122,16 +122,15 @@ r = session.get(url)
 url
 
 html = r.html.text
-
-stance = scrape_function.pull_data(html, 'Stance\n', '\n')
-
-
+html = re.sub('[^A-Za-z0-9]+', ' ', html)
+html
 
 
-
-
-# athletes_use['heat_wins'] = pd.to_numeric(athletes_use['heat_wins'])
-# athletes_use['heat_wins'].quantile([0.25,0.5,0.75])
+stance = pull_data(html, 'Stance', 'foot').split(' ')[1]
+born = pull_data(html, 'Born', 'age').split(' ')[1]
+height = ''.join(pull_data(html, 'Height', ' m ').split(' '))
+weight = pull_data(html, 'Weight', ' kg ').replace(' ','')
+hometown = [i for i in pull_data(html, "Born", "Residence").split(' ') if i != ''][-1:]
 
 
 
