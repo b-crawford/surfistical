@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 from scrape_function import pull_data
 from requests_html import HTMLSession
+import re
+
+
 
 # safe read csv files
 def safe_read(filepath):
@@ -106,34 +109,47 @@ athletes_use.isna().sum()
 athletes_use.loc[athletes_use['birthyear'].isna(),].head()
 
 # try and gather missing data from Wikipedia:
-missing = athletes_use.loc[athletes_use.isna().any(axis = 1),].reset_index()
-complete = athletes_use.loc[~athletes_use.isna().any(axis = 1),]
+missing = athletes_use.loc[athletes_use.isna().any(axis = 1)].reset_index(drop = True)
+complete = athletes_use.loc[~athletes_use.isna().any(axis = 1)]
 
-missing['name']
+for i in range(len(missing)):
+    i = 17
+    # i = 23
+    name = '_'.join([j.capitalize() for j in missing['name'][i].split('-')])
+    print('{:.1f}% complete'.format(100*i/len(missing)))
 
-i = 0
-name = '_'.join([i.capitalize()for i in missing['name'][i].split('-')])
+    url = 'https://en.wikipedia.org/wiki/'+name
 
-url = 'https://en.wikipedia.org/wiki/'+name
+    session = HTMLSession()
+    r = session.get(url)
 
-session = HTMLSession()
-r = session.get(url)
+    html = r.html.text
+    html = re.sub('[^A-Za-z0-9]+', ' ', html)
 
-url
+    stance = pull_data(html, 'Stance', 'foot', string_split_end=2)
+    born = pull_data(html, 'Born', 'age', string_split_end=2)
+    height = pull_data(html, 'Height', ' m ')
+    weight = pull_data(html, 'Weight', ' kg ')
+    hometown = pull_data(html, "Born", "Residence", string_split_start=-2)
 
-html = r.html.text
-html = re.sub('[^A-Za-z0-9]+', ' ', html)
-html
+    if 'in' in height: # sometimes inches are on the wikipedia page aswell
+        height = height.split('in')[-1:][0]
 
+    if 'lb' in weight: # sometimes inches are on the wikipedia page aswell
+        weight = weight.split('lb')[-1:][0]
 
-stance = pull_data(html, 'Stance', 'foot').split(' ')[1]
-born = pull_data(html, 'Born', 'age').split(' ')[1]
-height = ''.join(pull_data(html, 'Height', ' m ').split(' '))
-weight = pull_data(html, 'Weight', ' kg ').replace(' ','')
-hometown = [i for i in pull_data(html, "Born", "Residence").split(' ') if i != ''][-1:]
+    row = [stance,born,height,weight,hometown, None]
+    # for k in range(len(row)):
+    missing.iloc[i]
 
+    missing = missing.fillna('')
+    for k in range(len(row)):
+        if missing.iloc[i,k+1] =='':
+            missing.iloc[i,k+1] = row[k]
 
+athletes_use = pd.concat([missing,complete]).reset_index(drop=True)
 
+athletes_use
 
 # WRANGLE:
 
