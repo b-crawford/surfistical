@@ -112,11 +112,13 @@ athletes_use.loc[athletes_use['birthyear'].isna(),].head()
 missing = athletes_use.loc[athletes_use.isna().any(axis = 1)].reset_index(drop = True)
 complete = athletes_use.loc[~athletes_use.isna().any(axis = 1)]
 
+
+missing.iloc[64]
+
 for i in range(len(missing)):
-    i = 17
-    # i = 23
+    # i = 64
     name = '_'.join([j.capitalize() for j in missing['name'][i].split('-')])
-    print('{:.1f}% complete'.format(100*i/len(missing)))
+    # print('{:.1f}% complete'.format(100*(i+1)/len(missing)))
 
     url = 'https://en.wikipedia.org/wiki/'+name
 
@@ -138,9 +140,29 @@ for i in range(len(missing)):
     if 'lb' in weight: # sometimes inches are on the wikipedia page aswell
         weight = weight.split('lb')[-1:][0]
 
-    row = [stance,born,height,weight,hometown, None]
-    # for k in range(len(row)):
-    missing.iloc[i]
+    if len(hometown) ==1: # sometimes hometown is only one letter
+        hometown = pull_data(html, "Born", "Residence", string_split_start=-3)
+
+    if len(born) <4: # sometimes hometown is only one letter
+        born = pull_data(html, 'Born', 'age',string_split_start=3,string_split_end=4)
+
+    try: # sometimes birthyear is not numeric
+        born =  int(born)
+    except:
+        born = np.nan
+
+    try: # sometimes birthyear is not numeric
+        weight =  int(weight)
+    except:
+        weight = np.nan
+
+    if weight > 150:
+        weight = np.nan
+
+    if born > 1970: # if theyre really old its probably not them
+        row = [stance,born,height,weight,hometown, None]
+    else:
+        row = [None,None,None,None,None, None]
 
     missing = missing.fillna('')
     for k in range(len(row)):
@@ -149,11 +171,26 @@ for i in range(len(missing)):
 
 athletes_use = pd.concat([missing,complete]).reset_index(drop=True)
 
-athletes_use
+home_countries_conversion = {   'Carioca':'Brazil',
+                                'Central Coast NSW Australia':'Australia',
+                                'Florianopolis':'Brazil',
+                                'US': 'USA',
+                                'States':'USA'}
+
+athletes_use = athletes_use.replace({'homecountry':home_countries_conversion})
+
+chunk = -1
+chunk = chunk +1
+athletes_use.iloc[(chunk*5):(chunk+1)*5]
+
+athletes_use.iloc[14,5]
+# wierd homecountries:
+
+
 
 # WRANGLE:
 
-output = []
+)output = []
 i = 4
 
 # gather event information
