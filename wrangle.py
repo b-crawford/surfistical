@@ -47,7 +47,7 @@ one_hot_spots['Point'] = ['point' in i.lower() for i in spots['type']]
 one_hot_spots['Pier'] = ['pier' in i.lower() for i in spots['type']]
 
 
-one_hot_spots = pd.concat([one_hot_spots['spot-name'] ,pd.get_dummies(one_hot_spots.drop(['spot-name'], axis = 1))], axis = 1)
+one_hot_spots = pd.concat([one_hot_spots['spot-name'], pd.get_dummies(one_hot_spots.drop(['spot-name'], axis = 1))], axis = 1)
 one_hot_spots.head()
 
 
@@ -112,9 +112,6 @@ athletes_use.loc[athletes_use['birthyear'].isna(),].head()
 missing = athletes_use.loc[athletes_use.isna().any(axis = 1)].reset_index(drop = True)
 complete = athletes_use.loc[~athletes_use.isna().any(axis = 1)]
 
-
-missing.iloc[64]
-
 for i in range(len(missing)):
     # i = 64
     name = '_'.join([j.capitalize() for j in missing['name'][i].split('-')])
@@ -175,41 +172,70 @@ home_countries_conversion = {   'Carioca':'Brazil',
                                 'Central Coast NSW Australia':'Australia',
                                 'Florianopolis':'Brazil',
                                 'US': 'USA',
-                                'States':'USA'}
+                                'States':'USA',
+                                'California':'USA',
+                                'California,USA':'USA'}
 
-athletes_use = athletes_use.replace({'homecountry':home_countries_conversion})
+stance_conversion = {'Natural':'Regular'}
 
-chunk = -1
-chunk = chunk +1
-athletes_use.iloc[(chunk*5):(chunk+1)*5]
-
-athletes_use.iloc[14,5]
-# wierd homecountries:
-
+athletes_use = athletes_use.replace({'homecountry':home_countries_conversion, 'stance': stance_conversion})
 
 
 # WRANGLE:
 
-)output = []
+output = []
 i = 4
 
 # gather event information
 event_name = events.iloc[i,0]
 event_country = events.iloc[i,1]
+event_year = event_name[-4:]
 
 # gather spot information
 event_name_no_year = event_name[:-5]
 relevant_spots = list(contest_spots.loc[contest_spots['contest'] == event_name_no_year]['spot_name'])[0].split(', ')
 indices = [i in relevant_spots for i in spots['spot-name']]
 spot_chars = [np.mean(one_hot_spots.loc[indices]['max_swell']),np.mean(one_hot_spots.loc[indices]['min_swell'])]+[int(i >0) for i in one_hot_spots.drop(['spot-name','max_swell','min_swell'], axis = 1).loc[indices].sum()]
-spot_chars_names = one_hot_spots.columns[1:]
 
-# gather athlete information
-col_index = i+2
+
+# restrict reults information to that available at the time:
+col_index = np.where(results.columns == event_name)
+if len(col_index) != 1:
+    print('Error, more than one event a')
+    # break
+col_index = np.min(col_index)
 use_dat = results.iloc[:,:col_index]
 
-use_dat.head()
+# restict spot information to that available at the time:
+spot_use = pd.DataFrame()
+for k in 1:col_index:
+    event_name = events.iloc[k,0]
+    event_name_no_year = event_name[:-5]
+    relevant_spots = list(contest_spots.loc[contest_spots['contest'] == event_name_no_year]['spot_name'])[0].split(', ')
+    indices = [i in relevant_spots for i in spots['spot-name']]
+    spot_chars = [event_name]+[np.mean(one_hot_spots.loc[indices]['max_swell']),np.mean(one_hot_spots.loc[indices]['min_swell'])]+[int(i >0) for i in one_hot_spots.drop(['spot-name','max_swell','min_swell'], axis = 1).loc[indices].sum()]
+    spot_use = pd.concat([spot_chars,spot_chars], axis = 0)
 
+use_dat.head()
 j = 0
+# gather athlete information
 athlete = use_dat.iloc[j,0]
 athlete
+athlete_chars = athletes_use.loc[athletes_use['name']==athlete,].values.tolist()[0]
+
+# result
+result = use_dat.iloc[j,col_index-1]
+
+# form
+
+# spots with same characteristics (take mean for each characteristic)
+
+# results at same spot
+
+
+dat_to_save = [event_name,event_country,event_year]+athlete_chars+spot_chars
+
+
+
+spot_chars_names = one_hot_spots.columns.values.tolist()
+athlete_chars_names = athletes_use.columns.values.tolist()
