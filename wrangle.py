@@ -5,7 +5,6 @@ from requests_html import HTMLSession
 import re
 
 
-
 # safe read csv files
 def safe_read(filepath):
     try:
@@ -83,7 +82,7 @@ for year in range(first_year,last_year+1):
 
 # combine all athlete data into one:
 athletes = athletes.fillna('')
-athletes.head()
+results = results.replace('-',np.nan)
 
 # Extract columns we are going to use:
 athletes_use = pd.DataFrame(athletes['name'])
@@ -186,10 +185,13 @@ athletes_use = athletes_use.replace({'homecountry':home_countries_conversion, 's
 output = []
 i = 4
 
+row_add = []
 # gather event information
 event_name = events.iloc[i,0]
 event_country = events.iloc[i,1]
 event_year = event_name[-4:]
+
+row_add = row_add +[event_name,event_country,event_year]
 
 # gather spot information
 event_name_no_year = event_name[:-5]
@@ -197,43 +199,87 @@ relevant_spots = list(contest_spots.loc[contest_spots['contest'] == event_name_n
 indices = [i in relevant_spots for i in spots['spot-name']]
 spot_chars = [np.mean(one_hot_spots.loc[indices]['max_swell']),np.mean(one_hot_spots.loc[indices]['min_swell'])]+[int(i >0) for i in one_hot_spots.drop(['spot-name','max_swell','min_swell'], axis = 1).loc[indices].sum()]
 
+row_add = row_add + spot_chars
 
-# restrict reults information to that available at the time:
+# restrict results information to that available at the time:
 col_index = np.where(results.columns == event_name)
 if len(col_index) != 1:
     print('Error, more than one event a')
     # break
 col_index = np.min(col_index)
-use_dat = results.iloc[:,:col_index]
+results_use = results.iloc[:,:(col_index+1)]
 
 # restict spot information to that available at the time:
-spot_use = pd.DataFrame()
-for k in 1:col_index:
+spot_use = []
+for k in range(col_index-1):
     event_name = events.iloc[k,0]
     event_name_no_year = event_name[:-5]
     relevant_spots = list(contest_spots.loc[contest_spots['contest'] == event_name_no_year]['spot_name'])[0].split(', ')
     indices = [i in relevant_spots for i in spots['spot-name']]
     spot_chars = [event_name]+[np.mean(one_hot_spots.loc[indices]['max_swell']),np.mean(one_hot_spots.loc[indices]['min_swell'])]+[int(i >0) for i in one_hot_spots.drop(['spot-name','max_swell','min_swell'], axis = 1).loc[indices].sum()]
-    spot_use = pd.concat([spot_chars,spot_chars], axis = 0)
+    spot_use = spot_use = spot_use + [pd.Series(spot_chars)]
+spot_use = pd.concat(spot_use, axis = 1)
+spot_use = spot_use.transpose()
 
-use_dat.head()
+spot_use.head(10)
+
+results_use.head()
 j = 0
 # gather athlete information
-athlete = use_dat.iloc[j,0]
+athlete = results_use.iloc[j,0]
 athlete
 athlete_chars = athletes_use.loc[athletes_use['name']==athlete,].values.tolist()[0]
 
 # result
-result = use_dat.iloc[j,col_index-1]
+result = results_use.iloc[j,col_index-1]
+results_use.head()
 
+row_add = row_add + athlete_chars + [result]
 # form
+if col_index>2:
+    form1 = results_use.iloc[j,col_index-1]
+else:
+    form1 = np.nan
 
-# spots with same characteristics (take mean for each characteristic)
+if col_index>3:
+    form2 = results_use.iloc[j,col_index-2]
+else:
+    form2 = np.nan
+
+if col_index>4:
+    form3 = results_use.iloc[j,col_index-3]
+else:
+    form3 = np.nan
+
+
+# spots with same characteristics (take weighted mean for each characteristic)
+l = 1
+
+spot_use.head(10)
+
+
+
+chars = pd.to_numeric(spot_use.iloc[:,l])
+sq_diffs = [np.exp(-abs(i - chars[-1:])) for i in chars[:-1]]
+
+sq_diffs
+
+
+
+np.multiply(np.nan_to_num(pd.to_numeric(results_use.iloc[j,2:])),
+            np.nan_to_num(pd.to_numeric(spot_use.iloc[:,l])))
+
+
+
+spot_use.iloc[:,l]
+
+results_use.iloc[,]
+
+
+
 
 # results at same spot
 
-
-dat_to_save = [event_name,event_country,event_year]+athlete_chars+spot_chars
 
 
 
