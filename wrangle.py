@@ -80,9 +80,12 @@ for year in range(first_year,last_year+1):
     athletes = pd.concat([athletes, athletes1], axis = 0, sort = False)
 
 
+results = results.drop(['athlete-tour-rank-change'],axis = 1)
+
 # combine all athlete data into one:
 athletes = athletes.fillna('')
 results = results.replace('-',np.nan)
+results = results.replace('INJ',np.nan)
 
 # Extract columns we are going to use:
 athletes_use = pd.DataFrame(athletes['name'])
@@ -183,7 +186,7 @@ athletes_use = athletes_use.replace({'homecountry':home_countries_conversion, 's
 # WRANGLE:
 
 output = []
-i = 4
+i = 26
 
 row_add = []
 # gather event information
@@ -224,64 +227,73 @@ spot_use = spot_use.transpose()
 spot_use.head(10)
 
 results_use.head()
-j = 0
-# gather athlete information
-athlete = results_use.iloc[j,0]
-athlete
-athlete_chars = athletes_use.loc[athletes_use['name']==athlete,].values.tolist()[0]
+for j in range(len(results_use)):
+    j = 0
+    print(j)
+    # gather athlete information
+    athlete = results_use.iloc[j,0]
+    athlete
+    athlete_age = int(event_year) - int(athletes_use.loc[athletes_use['name']==athlete,].values[0][2])
+    athlete_chars = (athletes_use.loc[athletes_use['name']==athlete,].values.tolist()[0][:2] + [athlete_age] +
+                    athletes_use.loc[athletes_use['name']==athlete,].values.tolist()[0][3:])
 
-# result
-result = results_use.iloc[j,col_index-1]
-results_use.head()
+    # result
+    result = results_use.iloc[j,col_index-1]
+    results_use.head()
 
-row_add = row_add + athlete_chars + [result]
-# form
-if col_index>2:
-    form1 = results_use.iloc[j,col_index-1]
-else:
-    form1 = np.nan
+    row_add = row_add + athlete_chars + [result]
 
-if col_index>3:
-    form2 = results_use.iloc[j,col_index-2]
-else:
-    form2 = np.nan
+    # form
+    if col_index>2:
+        form1 = results_use.iloc[j,col_index-1]
+    else:
+        form1 = np.nan
 
-if col_index>4:
-    form3 = results_use.iloc[j,col_index-3]
-else:
-    form3 = np.nan
+    if col_index>3:
+        form2 = results_use.iloc[j,col_index-2]
+    else:
+        form2 = np.nan
 
+    if col_index>4:
+        form3 = results_use.iloc[j,col_index-3]
+    else:
+        form3 = np.nan
 
-# spots with same characteristics (take weighted mean for each characteristic)
-l = 1
+    row_add = row_add + [form1,form2,form3]
 
-spot_use.head(10)
+    # spots with same characteristics (take weighted mean for each characteristic)
+    weighted_char_scores = []
+    n = 2 # we take the nth root of the absoloute difference
+    for l in range(1,spot_use.shape[1]):
+        chars = pd.to_numeric(spot_use.iloc[:,l])
+        sq_diffs = np.nan_to_num(np.asarray([np.exp(-abs(i - chars.iloc[-1])**(1.0/n)) for i in chars.iloc[:-1]]))
+        res = np.nan_to_num(pd.to_numeric(results_use.iloc[j,2:-1]))
+        weighted_char_scores = weighted_char_scores + [np.sum(np.multiply(sq_diffs,res))/np.sum(sq_diffs)]
 
+    row_add = row_add + weighted_char_scores
 
+    # results at same spot
+    event_name_no_year = event_name[:-5]
+    spot_of_contest = list(contest_spots.loc[contest_spots['contest'] == event_name_no_year]['spot_name'])[0].split(', ')
+    relevant_spots = list(contest_spots.loc[contest_spots['contest'] == event_name_no_year]['spot_name'])[0].split(', ')
 
-chars = pd.to_numeric(spot_use.iloc[:,l])
-sq_diffs = [np.exp(-abs(i - chars[-1:])) for i in chars[:-1]]
+    same_spot_use = []
+    for k in range(col_index-1):
+        event_name = events.iloc[k,0]
+        event_name_no_year = event_name[:-5]
+        relevant_spots = list(contest_spots.loc[contest_spots['contest'] == event_name_no_year]['spot_name'])[0].split(', ')
+        intersection = [value for value in spot_of_contest if value in relevant_spots]
+        if(len(intersection)>0):
+            same_spot_use = same_spot_use + [event_name]
 
-sq_diffs
+    row_add = row_add +  [np.mean(pd.to_numeric(results_use.iloc[:,[p in same_spot_use for p in results_use.columns]].loc[j,:]))]
 
+    output = output +[pd.Series(row_add)]
 
+output = pd.concat(output, axis = 1)
+output = output.transpose()
 
-np.multiply(np.nan_to_num(pd.to_numeric(results_use.iloc[j,2:])),
-            np.nan_to_num(pd.to_numeric(spot_use.iloc[:,l])))
-
-
-
-spot_use.iloc[:,l]
-
-results_use.iloc[,]
-
-
-
-
-# results at same spot
-
-
-
-
+output.head()
+# colnames
 spot_chars_names = one_hot_spots.columns.values.tolist()
 athlete_chars_names = athletes_use.columns.values.tolist()
